@@ -90,17 +90,36 @@ components:
     chartVersion: "0.0.0"
     namespace: ymir
 
+  # -- Terasology ecosystem (upstream: MovingBlocks org) ---------------------
+  # These live in the MovingBlocks org, so the default gitOrg derivation would
+  # resolve wrong, and their repo names are CamelCase where the component names
+  # are lowercase. Both ends are pinned explicitly: `repo` is the upstream we
+  # track, `forkRepo` is the SiliconSaga fork we contribute through. Use
+  # `ws clone-fork <name>` to get upstream + fork remotes wired.
   terasology:
     tier: 3
     chartVersion: "0.0.0"
     chartName: "ts-game"
     namespace: terasology
+    repo: https://github.com/MovingBlocks/Terasology.git
+    forkRepo: https://github.com/SiliconSaga/Terasology.git
 
   destinationsol:
     tier: 3
     chartVersion: "0.0.0"
     chartName: "ds-game"
     namespace: destinationsol
+    repo: https://github.com/MovingBlocks/DestinationSol.git
+    forkRepo: https://github.com/SiliconSaga/DestinationSol.git
+
+  # Shared library family underpinning the Terasology engine (module system,
+  # asset pipeline, entity system). Not a deployable stack component and it
+  # ships no chart, so it takes the non-stack "supporting" tier rather than a
+  # numbered one.
+  gestalt:
+    tier: supporting
+    repo: https://github.com/MovingBlocks/gestalt.git
+    forkRepo: https://github.com/SiliconSaga/gestalt.git
 
   # -- Legacy Kubic game-server wrappers ------------------------------------
   # Plain-Kubernetes game-server wrappers predating tafl. Being dusted off as
