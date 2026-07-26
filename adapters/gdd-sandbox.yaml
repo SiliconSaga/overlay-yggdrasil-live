@@ -1,0 +1,12 @@
+# gdd-sandbox adapter — build/test commands and AI context pointers
+commands:
+  # Portable bash runner (no `make`; this host has no bats/shellcheck on PATH).
+  # test: workspace-vendored bats over tests/. lint: shellcheck via container.
+  test: "bash tests/run.sh test"
+  lint: "bash tests/run.sh lint"
+
+ai_context:
+  - path: "AGENTS.md"
+    description: "Agent guidelines for operating a gdd-sandbox"
+  - path: "docs/"
+    description: "Design and implementation plans"
