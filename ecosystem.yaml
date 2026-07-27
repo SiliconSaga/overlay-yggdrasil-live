@@ -25,6 +25,14 @@ identity:
   #
   # human_account is personal — set it in ecosystem.local.yaml, not here
 
+# Prose budget for commit / CR / issue bodies (terse | standard | detailed).
+# Budgets live in yggdrasil templates/*.md; `ws orient` reports the active
+# value. terse = subject line alone, plus a few body lines only when
+# something non-obvious needs recording. Override per-machine in
+# ecosystem.local.yaml if a given box wants more room.
+style:
+  changeNotes: terse
+
 # ---------------------------------------------------------------------------
 # Components
 # ---------------------------------------------------------------------------
