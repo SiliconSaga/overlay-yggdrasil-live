@@ -4,6 +4,11 @@ commands:
   # test: workspace-vendored bats over tests/. lint: shellcheck via container.
   test: "bash tests/run.sh test"
   lint: "bash tests/run.sh lint"
+  # Building the image is this component's real build step — it is what turns the
+  # scripts into something runnable. Declared here so it is discoverable via
+  # `ws actions` and works the moment a build verb exists, rather than living only
+  # in a README as a command people copy by hand.
+  build: "bash bin/build.sh"
 
 ai_context:
   - path: "AGENTS.md"
