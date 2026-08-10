@@ -12,9 +12,17 @@
 # `make ci`; run it via `ws exec leidangr make ci` until a dedicated `ws ci` verb
 # lands. Adapter commands are whitespace-tokenized (no shell), so multi-target
 # make invocations (`make test test-app`) work, but shell operators do not.
+#
+# run: the local dev server in stub mode — no secrets, no cluster. Long-lived
+# and interactive by nature, which is why `ws run` stays behind a permission
+# prompt rather than being pre-allowed. The Makefile target owns any environment
+# fixing (notably resolving a real mkdocs binary for TechDocs), so `make dev`
+# behaves identically whether launched through `ws run` or straight from a
+# terminal. `make dev-gitea` is the secrets-backed variant, still run directly.
 commands:
   test: "make test test-app"
   lint: "make lint tsc"
+  run: "make dev"
 
 ai_context:
   - path: "README.md"
