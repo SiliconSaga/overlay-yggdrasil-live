@@ -5,6 +5,13 @@ commands:
   run: "./gradlew :facades:PC:run"
   clean: "./gradlew clean"
 
+# Terasology is a workspace in its own right: modules and libraries are independent
+# repos meant to sit inside the engine tree, where the gradle harness can build them.
+# Declaring the shape rather than the contents keeps this stable while ~144 modules churn.
+nested:
+  - "modules/*"
+  - "libs/*"
+
 ai_context:
   - path: "CONTRIBUTING.md"
     description: "Contribution guidelines and PR conventions"
