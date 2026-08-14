@@ -201,20 +201,20 @@ components:
     chartVersion: "0.0.0"
     namespace: skipan
 
-  # mtl-site — Mountain Top League youth sports site (becoming the dedicated
-  # soccer sub-site; rename to mtl-soccer is owner-gated). Static Jekyll on
-  # GitHub Pages today (not cluster-deployed); declared here so the workspace
-  # can clone/exec/commit it. See docs/plans/2026-04-08-mtl-site-design.md and
-  # the component's _docs/plans/2026-08-09-per-sport-subsites-design.md.
-  mtl-site:
+  # mtl-soccer — Mountain Top League soccer sub-site, served at
+  # soccer.mountaintopleague.com. Static Jekyll on GitHub Pages (not
+  # cluster-deployed); declared here so the workspace can clone/exec/commit
+  # it. See docs/plans/2026-04-08-mtl-site-design.md and the component's
+  # _docs/plans/2026-08-09-per-sport-subsites-design.md.
+  mtl-soccer:
     tier: 3
     chartVersion: "0.0.0"
-    namespace: mtl-site
+    namespace: mtl-soccer
 
   # mtl-hockey — Mountain Top League hockey sub-site, first of the per-sport
   # sites. Static Jekyll on GitHub Pages (not cluster-deployed); declared so
   # the workspace can clone/exec/commit it and a gdd-sandbox can target it.
-  # See mtl-site _docs/plans/2026-08-09-per-sport-subsites-design.md.
+  # See mtl-soccer _docs/plans/2026-08-09-per-sport-subsites-design.md.
   mtl-hockey:
     tier: 3
     chartVersion: "0.0.0"
@@ -222,7 +222,7 @@ components:
 
   # volundr — shared CI forge: reusable workflows (Jekyll deploy, PR preview +
   # visual diff) called by the per-sport sites; future home of composite
-  # actions such as the Jules review trigger. See mtl-site
+  # actions such as the Jules review trigger. See mtl-soccer
   # _docs/plans/2026-08-09-per-sport-subsites-design.md.
   volundr:
     tier: supporting
