@@ -155,6 +155,59 @@ wsl -d rancher-desktop sudo sh -c 'echo "fs.inotify.max_user_instances=512" >> /
 > If the persistent method doesn't survive restarts (some WSL distros reset `/etc/sysctl.conf`),
 > add the `sysctl -w` command to your post-reset checklist.
 
+### WSL2 Disk Growth (Docker Logs, Images, Build Cache)
+
+Rancher Desktop's VM disk lives at `%LOCALAPPDATA%\rancher-desktop\distro-data` and is capped by the `experimental.virtualMachine.diskSize` setting (default `100GiB`). Filling it destabilises the whole machine — the cluster, Docker, and the Rancher Desktop UI all degrade together, and the failure looks like unrelated Hyper-V socket timeouts rather than an out-of-disk error.
+
+Two independent things cause it.
+
+**1. Docker logs are unbounded by default.** Rancher Desktop ships a `daemon.json` that sets no `log-opts`, so the `json-file` driver keeps every container's log forever. Because Rancher Desktop runs k3s *on the moby engine*, this covers **every Kubernetes pod log too** — a single chatty pod can fill the disk.
+
+Fix persistently with a provisioning script (`*.start` files in `%LOCALAPPDATA%\rancher-desktop\provisioning\` run on every startup, before the main services):
+
+```sh
+# 10-docker-log-rotation.start
+#!/bin/sh
+set -e
+DAEMON_JSON=/etc/docker/daemon.json
+[ -f "$DAEMON_JSON" ] || exit 0
+grep -q '"log-driver"' "$DAEMON_JSON" && exit 0
+sed -i '0,/{/s//{\n  "log-driver": "json-file",\n  "log-opts": { "max-size": "50m", "max-file": "3" },/' "$DAEMON_JSON"
+```
+
+Editing in place with `sed` rather than writing a whole file preserves the RD-managed keys (`min-api-version`, `seccomp-profile`, `containerd-snapshotter`); the `grep` guard makes it idempotent. Verify after the next restart:
+
+```powershell
+wsl -d rancher-desktop cat /etc/docker/daemon.json
+```
+
+**2. Images and build cache accumulate silently.** Check what is actually reclaimable before assuming logs are the culprit — they usually are not:
+
+```powershell
+docker system df
+```
+
+Prune from safest to most disruptive:
+
+```powershell
+docker builder prune -af      # build cache — safe, nothing depends on it
+docker container prune -f     # stopped containers, and their json logs
+docker image prune -a         # unused images — forces re-pulls on next use
+```
+
+> **Never blanket `docker volume prune`.** Volumes hold real data — the Rend/KubicRend spike volumes alone are ~2.7GB of UE4 server download that would have to be re-fetched. Remove volumes by name, deliberately.
+
+**3. Reclaiming inside the VM does not shrink the disk on Windows.** This is the step people miss: a WSL2 `.vhdx` grows monotonically and never shrinks on its own. After pruning 37GB you will still see the same size in `distro-data`. Compacting needs the VM shut down:
+
+```powershell
+rdctl shutdown
+wsl --shutdown
+# WSL 2.0+ — lets the disk shrink automatically from now on
+wsl --manage rancher-desktop-data --set-sparse true
+```
+
+Sanity-check both numbers, since they answer different questions — `docker system df` shows space free *inside* the VM, and the `distro-data` folder size shows what Windows has actually got back.
+
 ### Resetting the Environment
 
 If you need to wipe the cluster clean (e.g., to clear out old deployments before a fresh bootstrap), use the Rancher Desktop CLI (`rdctl`) or the GUI.
