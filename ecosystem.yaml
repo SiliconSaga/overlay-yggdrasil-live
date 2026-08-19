@@ -242,13 +242,13 @@ components:
   # optional tool rather than part of this stack, and it ships from its own repo
   # on its own cadence; declared here so `ws clone gdd-sandbox` works like any
   # other component instead of needing a per-developer override. Not
-  # cluster-deployed — it runs as a container on an operator's own machine. See
-  # yggdrasil's docs/gdd/features.md#sandboxed-workspaces--gdd-sandbox-optional-companion
+  # cluster-deployed and it ships no chart — it runs as a container on an
+  # operator's own machine — so it takes the non-stack "supporting" tier, like
+  # gestalt above. See yggdrasil's
+  # docs/gdd/features.md#sandboxed-workspaces--gdd-sandbox-optional-companion
   # and the component's own README for setup.
   gdd-sandbox:
-    tier: 3
-    chartVersion: "0.0.0"
-    namespace: gdd-sandbox
+    tier: supporting
 
   # -- Vendored upstream mirrors --------------------------------------------
   # Read-only mirrors of third-party repos the stack deploys from. Kept as
