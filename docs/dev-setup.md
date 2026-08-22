@@ -272,4 +272,90 @@ k3d cluster create refr-k8s \
 ./bootstrap.sh homelab
 ```
 
+## Node.js and Ruby (site components)
+
+The cluster work above needs neither. These are for the realm's **static-site** components, and you only need them if you are working on one locally:
+
+| Component | Needs | For |
+|---|---|---|
+| `ken-site`, `mtl-soccer`, `mtl-hockey` | Ruby + Bundler | Jekyll builds via the `github-pages` gem |
+| the same sites' `.github/visual-diff/` | Node | Playwright screenshots + pixel diffing used by the PR preview workflow |
+| `leidangr` | Node | Backstage |
+
+**You can skip both and still contribute.** These sites build in CI on every pull request, and the PR page carries the preview link and before/after screenshots — that is the review surface, not a local build. Install these when you want a faster loop on a Liquid error, or when you are changing the visual-diff scripts themselves and need to run them.
+
+**Versions.** Node **LTS** — `winget` installed 24.19.0 at the time of writing, and Playwright and the `gdd-sandbox` image both track LTS rather than a pinned major. Ruby **3.3.x**; the `github-pages` gem pins the rest of the set, so the Ruby version is the only choice you make. Jekyll comes out as 3.10.0, which is what GitHub Pages runs — not the Jekyll 4 you would get installing it directly.
+
+### Windows
+
+`winget` ships with Windows and is what this realm's machines actually use; the Chocolatey sections above predate it. Either works — pick one and stay with it, because two package managers owning the same tool is its own afternoon.
+
+```powershell
+winget install --id OpenJS.NodeJS.LTS
+winget install --id RubyInstallerTeam.RubyWithDevKit.3.3
+```
+
+**Take the *WithDevKit* Ruby, not the bare one.** Jekyll's dependency set includes native gems (`nokogiri`, `sass`, `ffi`), and without the DevKit's MSYS2 toolchain `bundle install` fails partway through compiling them, with an error that reads like a broken gem rather than a missing compiler. After installing, run `ridk install` once and take options 1 and 3 when prompted.
+
+Chocolatey equivalents, if that is already your manager:
+
+```powershell
+choco install nodejs-lts ruby -y
+```
+
+Restart the terminal afterwards — both installers extend `PATH`, and Git Bash reads it at startup.
+
+### macOS
+
+```bash
+brew install node ruby
+```
+
+Homebrew's Ruby is not the system Ruby: add its `bin` to `PATH` ahead of `/usr/bin` (`brew info ruby` prints the line for your shell) or `gem install` writes to a location that needs `sudo` and Jekyll runs against 2.6.
+
+### Linux
+
+The `gdd-sandbox` image builds this exact stack on Debian, so its package list is the tested one:
+
+```bash
+# Node LTS via NodeSource
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Ruby plus the headers native gems compile against
+sudo apt-get install -y ruby-full build-essential zlib1g-dev libffi-dev libyaml-dev
+```
+
+The three `-dev` packages are the Linux equivalent of the DevKit above: without them the same native gems fail the same way.
+
+### Verify
+
+```bash
+node --version     # v22.x or newer
+npm --version
+ruby --version     # 3.3.x
+bundle --version
+```
+
+Then, from the workspace root, against a site you have cloned:
+
+```bash
+ws exec ken-site bundle check          # "dependencies are satisfied" — reads, never rewrites
+ws exec ken-site bundle exec jekyll --version
+```
+
+`bundle check` before `bundle install`: it answers the same question without touching the lockfile, which matters here for the reason below.
+
+### One gotcha worth knowing before your first `bundle install`
+
+**These sites' `Gemfile.lock` files are production-load-bearing.** GitHub Pages builds from the committed lockfile, so a local `bundle install` that re-resolves and rewrites it changes what the live site is built from — silently, in a diff that looks like housekeeping. It has happened: a session watched `nokogiri` and `activesupport` move and reverted by hand.
+
+Set bundler to refuse the rewrite rather than remembering not to commit it:
+
+```bash
+bundle config set --global frozen true
+```
+
+A lockfile that cannot be satisfied then fails loudly, which is the correct outcome — that is news, not something to quietly fix. The `gdd-sandbox` image sets the same thing for the same reason.
+
 ## Linux Setup (Coming Soon)
