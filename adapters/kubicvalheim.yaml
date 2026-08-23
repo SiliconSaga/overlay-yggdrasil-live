@@ -1,0 +1,16 @@
+# kubicvalheim adapter — build/test commands and AI context pointers
+#
+# test: kubicvalheim is a Kustomize-based infra repo with no unit-test suite, so
+# "every overlay still renders" IS the test — tests/render-all.sh discovers every
+# dir under kustomize/overlays/ (never hardcoded, since scripts/start-server.sh
+# generates gitignored ad-hoc instance overlays) and runs `kubectl kustomize` on
+# each, PASSing/FAILing per overlay and SKIPping the legitimate case of an
+# overlay whose gitignored secret.yaml hasn't been rendered yet.
+commands:
+  test: "bash tests/render-all.sh"
+
+ai_context:
+  - path: "README.md"
+    description: "Three-flavor overview (plain Docker / plain k8s / GitOps) and connect/port details"
+  - path: "docs/plans/"
+    description: "Backups + game-volume design and implementation plan"
