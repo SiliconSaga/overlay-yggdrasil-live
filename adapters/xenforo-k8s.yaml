@@ -1,0 +1,25 @@
+# xenforo-k8s adapter — build/test commands and AI context pointers
+#
+# test: like kubicvalheim, this is a Kustomize-based infra repo with no unit-test
+# suite, so "every overlay still renders" IS the test. tests/render-all.sh discovers
+# every dir under kustomize/overlays/ rather than hardcoding a list, and picks its
+# renderer by CAPABILITY — probing each of KUSTOMIZE_BIN / kustomize / kubectl
+# kustomize against a real overlay and using the first that can build this repo.
+# `components:` needs kustomize >= 3.7 and `labels:` >= 4.x, and an older renderer
+# fails with a bare `unknown field "components"` that reads like a manifest bug.
+#
+# build: the runtime image. Deliberately NOT wired to a `ws build` that pushes —
+# CI owns publishing (.github/workflows/image.yml); this is the local rehearsal.
+commands:
+  test: "bash tests/render-all.sh"
+  build: "docker build -t xenforo-k8s:local image"
+
+ai_context:
+  - path: "README.md"
+    description: "Three-flavor overview (plain Docker / plain k8s / GitOps), pod shape, and secret handling"
+  - path: "docs/licensing-and-ci.md"
+    description: "Why no image contains XenForo source, and what that costs — read before changing the image or CI"
+  - path: "docs/upgrades.md"
+    description: "Image vs XenForo upgrades, and the PHP version bump checklist"
+  - path: "kustomize/components/db-throwaway/README.md"
+    description: "The disposable database and the cutover path to a mimir Percona MySQL claim"
