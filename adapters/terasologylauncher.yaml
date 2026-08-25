@@ -1,6 +1,6 @@
 # terasologylauncher adapter — build/test commands and AI context pointers
 commands:
-  build: "./gradlew jar"
+  build: "./gradlew build"
   test: "./gradlew test"
   lint: "./gradlew check -x test"
   run: "./gradlew run"
