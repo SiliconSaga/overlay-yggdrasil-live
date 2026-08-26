@@ -18,11 +18,19 @@
 # `ws test terasology` reports whatever Gradle's exit code says, and for this
 # project that is always success: `build-logic/src/main/kotlin/terasology-metrics.gradle.kts`
 # sets `ignoreFailures = true` inside `tasks.withType<Test>`, so every test task
-# exits zero regardless of results. Treat a green `ws test terasology` as "the
-# run completed", not "the tests passed", and read
-# `engine-tests/build/test-results/**/TEST-*.xml` for the actual verdict.
-# Making that safe for automation is an upstream change, not an adapter one — a
-# wrapper here would hide the real fix rather than make it.
+# exits zero regardless of results.
+#
+# That is deliberate and it is not a bug to route around. Jenkins reads the
+# reports and marks a build with analytics or test issues UNSTABLE rather than
+# FAILED, which keeps a red X for "the build broke" and a yellow one for "the
+# build has findings". Flipping the flag would collapse that distinction
+# upstream to fix a local inconvenience.
+#
+# The cost lands locally, where nothing reads the reports: a green
+# `ws test terasology` means the run completed, not that the tests passed. Read
+# `engine-tests/build/test-results/**/TEST-*.xml` for the verdict. Giving the
+# local path its own signal — without disturbing the Jenkins semantics — is an
+# open question, not a solved one.
 #
 # `lint` is only half-affected, and the halves differ: Checkstyle sets
 # `isIgnoreFailures = false`, so a style violation does fail the command, while
