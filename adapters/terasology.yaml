@@ -14,6 +14,20 @@
 # for now — but every value here is hashed into the realm trust
 # fingerprint and printed in the trust summary, so an unscoped one is
 # still a footgun someone can copy.
+#
+# `ws test terasology` reports whatever Gradle's exit code says, and for this
+# project that is always success: `build-logic/src/main/kotlin/terasology-metrics.gradle.kts`
+# sets `ignoreFailures = true` inside `tasks.withType<Test>`, so every test task
+# exits zero regardless of results. Treat a green `ws test terasology` as "the
+# run completed", not "the tests passed", and read
+# `engine-tests/build/test-results/**/TEST-*.xml` for the actual verdict.
+# Making that safe for automation is an upstream change, not an adapter one — a
+# wrapper here would hide the real fix rather than make it.
+#
+# `lint` is only half-affected, and the halves differ: Checkstyle sets
+# `isIgnoreFailures = false`, so a style violation does fail the command, while
+# PMD sets it true and so reports nothing through the exit code. A green `ws
+# lint terasology` therefore means "no Checkstyle violations", not "clean".
 commands:
   build: "./gradlew :facades:PC:build"
   test: "./gradlew :engine-tests:test"
