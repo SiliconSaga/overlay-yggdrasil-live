@@ -1,0 +1,30 @@
+# mimir adapter — test/lint commands and AI context pointers
+commands:
+  # Default is cluster-free: the operator's Go unit tests. This is what runs
+  # before a commit, so it must not need a cluster or minutes of wall clock.
+  #
+  # The heavier suites are flags on the same wrapper, because `ws test` passes
+  # flags through but rejects bare positional selectors for non-Gradle/pytest
+  # adapters:
+  #   ws test mimir --integration                     needs MIMIR_TEST_PG
+  #   ws test mimir --e2e                             kuttl, whole suite
+  #   ws test mimir --e2e --test=dataservice-isolation
+  #
+  # Note the `=` in that last one. `--test dataservice-isolation` would make
+  # the suite name a positional arg, which `ws test` refuses before the wrapper
+  # ever sees it.
+  #
+  # kuttl has no native Windows binary, so run-kuttl.sh drives the official
+  # image over Docker. It refuses a non-local cluster by default — the suite
+  # creates and destroys namespaces, and a workstation usually has some other
+  # context selected.
+  test: "bash scripts/test.sh"
+  lint: "bash scripts/lint.sh"
+
+ai_context:
+  - path: "README.md"
+    description: "Data services overview — engines, claims, and what Mimir vends"
+  - path: "operator/README.md"
+    description: "DataService operator — API, configuration, and the shared-cluster model"
+  - path: "docs/cluster-setup.md"
+    description: "Bringing the Percona operators and shared clusters up"
