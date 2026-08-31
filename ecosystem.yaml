@@ -220,6 +220,15 @@ components:
     chartVersion: "0.0.0"
     namespace: mtl-hockey
 
+  # mtl-volunteering — Mountain Top League cross-sport volunteer guide
+  # (league house, gear, sportsmanship, safety), served at
+  # volunteering.mountaintopleague.com. Static Jekyll on GitHub Pages (not
+  # cluster-deployed); declared here so the workspace can clone/exec/commit it.
+  mtl-volunteering:
+    tier: 3
+    chartVersion: "0.0.0"
+    namespace: mtl-volunteering
+
   # volundr — shared CI forge: reusable workflows (Jekyll deploy, PR preview +
   # visual diff) called by the per-sport sites; future home of composite
   # actions such as the Jules review trigger. See mtl-soccer
